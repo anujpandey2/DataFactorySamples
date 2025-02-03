@@ -1,0 +1,101 @@
+{
+  "properties": {
+    "activities": [
+      {
+        "name": "Get Metadata1",
+        "type": "GetMetadata",
+        "dependsOn": [],
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureOutput": false,
+          "secureInput": false
+        },
+        "typeProperties": {
+          "fieldList": [
+            "exists"
+          ],
+          "datasetSettings": {
+            "annotations": [],
+            "linkedService": {
+              "name": "SalesWH",
+              "properties": {
+                "annotations": [],
+                "type": "DataWarehouse",
+                "typeProperties": {
+                  "endpoint": "2p6jmx2ukzpuxiz6drubxwyht4-towouxw6rdpudffreao2laftea.datawarehouse.fabric.microsoft.com",
+                  "artifactId": "bd809b4e-73fa-424b-a135-689a0aa3eafe",
+                  "workspaceId": "5eeaac9b-88de-41df-94b1-201da580b320"
+                }
+              }
+            },
+            "type": "DataWarehouseTable",
+            "schema": [],
+            "typeProperties": {
+              "schema": "dbo",
+              "table": "Employeedata"
+            }
+          }
+        }
+      },
+      {
+        "name": "If Condition1",
+        "type": "IfCondition",
+        "dependsOn": [
+          {
+            "activity": "Get Metadata1",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ],
+        "typeProperties": {
+          "expression": {
+            "value": "@activity('Get Metadata1').output.exists",
+            "type": "Expression"
+          },
+          "ifFalseActivities": [
+            {
+              "name": "Script1",
+              "type": "Script",
+              "dependsOn": [],
+              "policy": {
+                "timeout": "0.12:00:00",
+                "retry": 0,
+                "retryIntervalInSeconds": 30,
+                "secureOutput": false,
+                "secureInput": false
+              },
+              "linkedService": {
+                "name": "SalesWH",
+                "properties": {
+                  "annotations": [],
+                  "type": "DataWarehouse",
+                  "typeProperties": {
+                    "endpoint": "2p6jmx2ukzpuxiz6drubxwyht4-towouxw6rdpudffreao2laftea.datawarehouse.fabric.microsoft.com",
+                    "artifactId": "bd809b4e-73fa-424b-a135-689a0aa3eafe",
+                    "workspaceId": "5eeaac9b-88de-41df-94b1-201da580b320"
+                  }
+                }
+              },
+              "typeProperties": {
+                "scripts": [
+                  {
+                    "type": "Query",
+                    "text": {
+                      "value": "create table dbo.employeedata\n(\nempname varchar(30)\n);",
+                      "type": "Expression"
+                    }
+                  }
+                ],
+                "scriptBlockExecutionTimeout": "02:00:00"
+              }
+            }
+          ],
+          "ifTrueActivities": []
+        }
+      }
+    ]
+  }
+}

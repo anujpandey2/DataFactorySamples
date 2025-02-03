@@ -1,0 +1,94 @@
+{
+  "properties": {
+    "activities": [
+      {
+        "type": "Copy",
+        "typeProperties": {
+          "source": {
+            "type": "RestSource",
+            "requestMethod": "GET",
+            "paginationRules": {
+              "supportRFC5988": "true"
+            },
+            "httpRequestTimeout": "00:01:40",
+            "requestInterval": "00.00:00:00.010",
+            "datasetSettings": {
+              "type": "RestResource",
+              "typeProperties": {
+                "relativeUrl": {
+                  "value": "@concat('/data/2.5/weather?lat=',pipeline().parameters.latitude,'&lon=',pipeline().parameters.longitude,'&appid=',pipeline().parameters.api_key)",
+                  "type": "Expression"
+                }
+              },
+              "schema": [],
+              "externalReferences": {
+                "connection": "9a93dec4-a176-4e5e-af42-4c14a34b48ef"
+              },
+              "annotations": []
+            }
+          },
+          "sink": {
+            "type": "JsonSink",
+            "formatSettings": {
+              "type": "JsonWriteSettings"
+            },
+            "storeSettings": {
+              "type": "LakehouseWriteSettings"
+            },
+            "datasetSettings": {
+              "type": "Json",
+              "typeProperties": {
+                "location": {
+                  "type": "LakehouseLocation",
+                  "folderPath": {
+                    "value": "@concat(formatDateTime(utcNow(),'yyyy'),'/',formatDateTime(utcNow(),'MM'),'/',formatDateTime(utcNow(),'dd'),'/')",
+                    "type": "Expression"
+                  },
+                  "fileName": "weather.json"
+                }
+              },
+              "schema": {},
+              "linkedService": {
+                "name": "LKH_Bronze",
+                "properties": {
+                  "type": "Lakehouse",
+                  "typeProperties": {
+                    "artifactId": "2deda88c-5aae-9eef-423b-e600e9cab68e",
+                    "workspaceId": "00000000-0000-0000-0000-000000000000",
+                    "rootFolder": "Files"
+                  },
+                  "annotations": []
+                }
+              },
+              "annotations": []
+            }
+          },
+          "enableStaging": false
+        },
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureInput": false,
+          "secureOutput": false
+        },
+        "name": "Copy data1",
+        "dependsOn": []
+      }
+    ],
+    "parameters": {
+      "latitude": {
+        "type": "string",
+        "defaultValue": "29.76328"
+      },
+      "longitude": {
+        "type": "string",
+        "defaultValue": "-95.36327"
+      },
+      "api_key": {
+        "type": "string",
+        "defaultValue": "45fb636c430d907dfe39cc8f11e113c4"
+      }
+    }
+  }
+}

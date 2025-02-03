@@ -1,0 +1,140 @@
+{
+  "properties": {
+    "activities": [
+      {
+        "name": "Lookup1",
+        "type": "Lookup",
+        "dependsOn": [],
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureOutput": false,
+          "secureInput": false
+        },
+        "typeProperties": {
+          "source": {
+            "type": "DataWarehouseSource",
+            "sqlReaderQuery": "Select * FROM md_tables where \nintegration_name='IntProduct' and \nsource_table_name='ProductDescription'",
+            "queryTimeout": "02:00:00",
+            "partitionOption": "None"
+          },
+          "firstRowOnly": false,
+          "datasetSettings": {
+            "annotations": [],
+            "linkedService": {
+              "name": "WH_GOLD",
+              "properties": {
+                "annotations": [],
+                "type": "DataWarehouse",
+                "typeProperties": {
+                  "endpoint": "2p6jmx2ukzpuxiz6drubxwyht4-towouxw6rdpudffreao2laftea.datawarehouse.fabric.microsoft.com",
+                  "artifactId": "98c1c4b4-291c-4caa-8050-896d5dae137e",
+                  "workspaceId": "5eeaac9b-88de-41df-94b1-201da580b320"
+                }
+              }
+            },
+            "type": "DataWarehouseTable",
+            "schema": [],
+            "typeProperties": {}
+          }
+        }
+      },
+      {
+        "name": "Copy data1",
+        "type": "Copy",
+        "dependsOn": [
+          {
+            "activity": "Lookup1",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ],
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureOutput": false,
+          "secureInput": false
+        },
+        "typeProperties": {
+          "source": {
+            "type": "DataWarehouseSource",
+            "queryTimeout": "02:00:00",
+            "partitionOption": "None",
+            "datasetSettings": {
+              "annotations": [],
+              "linkedService": {
+                "name": "WH_GOLD",
+                "properties": {
+                  "annotations": [],
+                  "type": "DataWarehouse",
+                  "typeProperties": {
+                    "endpoint": "2p6jmx2ukzpuxiz6drubxwyht4-towouxw6rdpudffreao2laftea.datawarehouse.fabric.microsoft.com",
+                    "artifactId": "98c1c4b4-291c-4caa-8050-896d5dae137e",
+                    "workspaceId": "5eeaac9b-88de-41df-94b1-201da580b320"
+                  }
+                }
+              },
+              "type": "DataWarehouseTable",
+              "schema": [],
+              "typeProperties": {
+                "schema": {
+                  "value": "@activity('Lookup1').output.value[0].source_table_schema",
+                  "type": "Expression"
+                },
+                "table": {
+                  "value": "@activity('Lookup1').output.value[0].source_table_name",
+                  "type": "Expression"
+                }
+              }
+            }
+          },
+          "sink": {
+            "type": "DataWarehouseSink",
+            "allowCopyCommand": true,
+            "copyCommandSettings": {},
+            "tableOption": "autoCreate",
+            "datasetSettings": {
+              "annotations": [],
+              "linkedService": {
+                "name": "SalesWH",
+                "properties": {
+                  "annotations": [],
+                  "type": "DataWarehouse",
+                  "typeProperties": {
+                    "endpoint": "2p6jmx2ukzpuxiz6drubxwyht4-towouxw6rdpudffreao2laftea.datawarehouse.fabric.microsoft.com",
+                    "artifactId": "bd809b4e-73fa-424b-a135-689a0aa3eafe",
+                    "workspaceId": "5eeaac9b-88de-41df-94b1-201da580b320"
+                  }
+                }
+              },
+              "type": "DataWarehouseTable",
+              "schema": [],
+              "typeProperties": {
+                "schema": {
+                  "value": "@activity('Lookup1').output.value[0].target_table_schema",
+                  "type": "Expression"
+                },
+                "table": {
+                  "value": "@activity('Lookup1').output.value[0].target_table_name",
+                  "type": "Expression"
+                }
+              }
+            }
+          },
+          "enableStaging": true,
+          "translator": {
+            "type": "TabularTranslator",
+            "typeConversion": true,
+            "typeConversionSettings": {
+              "allowDataTruncation": true,
+              "treatBooleanAsNumber": false
+            }
+          }
+        }
+      }
+    ]
+  }
+}

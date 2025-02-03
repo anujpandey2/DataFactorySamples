@@ -1,0 +1,33 @@
+{
+  "properties": {
+    "activities": [
+      {
+        "name": "Set variable1",
+        "type": "SetVariable",
+        "dependsOn": [],
+        "policy": {
+          "secureOutput": false,
+          "secureInput": false
+        },
+        "typeProperties": {
+          "variableName": "PipeLineName",
+          "value": {
+            "value": "@concat(pipeline().parameters.FileName,utcNow(),'mm/dd/yyyy')",
+            "type": "Expression"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "FileName": {
+        "type": "string",
+        "defaultValue": "anujtest.txt"
+      }
+    },
+    "variables": {
+      "PipeLineName": {
+        "type": "String"
+      }
+    }
+  }
+}

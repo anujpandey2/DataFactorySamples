@@ -1,0 +1,102 @@
+{
+  "properties": {
+    "activities": [
+      {
+        "name": "Dataflow1",
+        "type": "RefreshDataflow",
+        "state": "Inactive",
+        "onInactiveMarkAs": "Succeeded",
+        "dependsOn": [],
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureOutput": false,
+          "secureInput": false
+        },
+        "typeProperties": {
+          "dataflowId": "9829ef2e-4728-4c58-a1cf-7b15283f94bf",
+          "workspaceId": "5eeaac9b-88de-41df-94b1-201da580b320",
+          "notifyOption": "NoNotification"
+        }
+      },
+      {
+        "name": "UPSERT",
+        "type": "Script",
+        "dependsOn": [
+          {
+            "activity": "Dataflow1",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ],
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureOutput": false,
+          "secureInput": false
+        },
+        "linkedService": {
+          "name": "SalesWH",
+          "properties": {
+            "annotations": [],
+            "type": "DataWarehouse",
+            "typeProperties": {
+              "endpoint": "2p6jmx2ukzpuxiz6drubxwyht4-towouxw6rdpudffreao2laftea.datawarehouse.fabric.microsoft.com",
+              "artifactId": "bd809b4e-73fa-424b-a135-689a0aa3eafe",
+              "workspaceId": "5eeaac9b-88de-41df-94b1-201da580b320"
+            }
+          }
+        },
+        "typeProperties": {
+          "scripts": [
+            {
+              "type": "Query",
+              "text": {
+                "value": "exec  [ETL].[UpsertDimCustomer]",
+                "type": "Expression"
+              }
+            }
+          ],
+          "scriptBlockExecutionTimeout": "02:00:00"
+        }
+      },
+      {
+        "name": "Stored procedure1",
+        "type": "SqlServerStoredProcedure",
+        "dependsOn": [
+          {
+            "activity": "UPSERT",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ],
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureOutput": false,
+          "secureInput": false
+        },
+        "typeProperties": {
+          "storedProcedureName": "[ETL].[InsertNewFactSalesRecords]"
+        },
+        "linkedService": {
+          "name": "SalesWH",
+          "properties": {
+            "annotations": [],
+            "type": "DataWarehouse",
+            "typeProperties": {
+              "endpoint": "2p6jmx2ukzpuxiz6drubxwyht4-towouxw6rdpudffreao2laftea.datawarehouse.fabric.microsoft.com",
+              "artifactId": "bd809b4e-73fa-424b-a135-689a0aa3eafe",
+              "workspaceId": "5eeaac9b-88de-41df-94b1-201da580b320"
+            }
+          }
+        }
+      }
+    ]
+  }
+}
